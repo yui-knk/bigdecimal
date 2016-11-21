@@ -62,6 +62,7 @@ static ID id_ceil;
 static ID id_floor;
 static ID id_to_r;
 static ID id_eq;
+static ID id_half;
 
 /* MACRO's to guard objects from GC by keeping them in stack */
 #define ENTER(n) volatile VALUE RB_UNUSED_VAR(vStack[n]);int iStack=0
@@ -441,11 +442,54 @@ BigDecimal_load(VALUE self, VALUE str)
 }
 
 static unsigned short
+check_rounding_mode_option(VALUE const opts)
+{
+    VALUE mode;
+    char const *s;
+    long l;
+
+    assert(RB_TYPE_P(opts, T_HASH));
+
+    if (NIL_P(opts))
+        goto noopt;
+
+    mode = rb_hash_lookup2(opts, ID2SYM(id_half), Qundef);
+    if (mode == Qundef)
+        goto noopt;
+
+    if (SYMBOL_P(mode))
+        mode = rb_sym2str(mode);
+    s = StringValueCStr(mode);
+    l = RSTRING_LEN(mode);
+    switch (l) {
+      case 2:
+        if (strncasecmp(s, "up", 2) == 0)
+            return VP_ROUND_HALF_UP;
+        break;
+      case 4:
+        if (strncasecmp(s, "even", 4) == 0)
+            return VP_ROUND_HALF_EVEN;
+        else if (strncasecmp(s, "down", 4) == 0)
+            return VP_ROUND_HALF_EVEN;
+        break;
+      default:
+        break;
+    }
+    rb_raise(rb_eArgError, "unknown rounding mode: %"PRIsVALUE, mode);
+
+  noopt:
+    return VpGetRoundMode();
+}
+
+static unsigned short
 check_rounding_mode(VALUE const v)
 {
     unsigned short sw;
     ID id;
     switch (TYPE(v)) {
+      case T_HASH:
+        return VP_ROUND_HALF_UP;
+
       case T_SYMBOL:
 	id = SYM2ID(v);
 	if (id == id_up)
@@ -1720,7 +1764,12 @@ BigDecimal_round(int argc, VALUE *argv, VALUE self)
 	iLoc = 0;
 	break;
       case 1:
-	iLoc = NUM2INT(vLoc);
+        if (RB_TYPE_P(vLoc, T_HASH)) {
+	    sw = check_rounding_mode(vLoc);
+	}
+	else {
+	    iLoc = NUM2INT(vLoc);
+	}
 	break;
       case 2:
 	iLoc = NUM2INT(vLoc);
