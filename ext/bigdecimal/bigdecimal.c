@@ -4681,7 +4681,7 @@ Exit:
 /*
  *   c = a / b,  remainder = r
  */
-    VP_EXPORT size_t
+    VP_EXPORT void
 VpDivd(Real *c, Real *r, Real *a, Real *b)
 {
     size_t word_a, word_b, word_c, word_r;
@@ -4702,11 +4702,13 @@ VpDivd(Real *c, Real *r, Real *a, Real *b)
     if (!VpIsDefOP(c, a, b, 4)) goto Exit;
     if (VpIsZero(a) && VpIsZero(b)) {
 	VpSetNaN(c);
-	return VpException(VP_EXCEPTION_NaN, "(VpDivd) 0/0 not defined(NaN)", 0);
+	VpException(VP_EXCEPTION_NaN, "(VpDivd) 0/0 not defined(NaN)", 0);
+	return;
     }
     if (VpIsZero(b)) {
 	VpSetInf(c, VpGetSign(a) * VpGetSign(b));
-	return VpException(VP_EXCEPTION_ZERODIVIDE, "(VpDivd) Divide by zero", 0);
+	VpException(VP_EXCEPTION_ZERODIVIDE, "(VpDivd) Divide by zero", 0);
+	return;
     }
     if (VpIsZero(a)) {
 	/* numerator a is zero  */
@@ -4858,14 +4860,14 @@ carry:
 out_side:
     c->Prec = word_c;
     c->exponent = a->exponent;
-    if (!AddExponent(c, 2)) return 0;
-    if (!AddExponent(c, -(b->exponent))) return 0;
+    if (!AddExponent(c, 2)) return;
+    if (!AddExponent(c, -(b->exponent))) return;
 
     VpSetSign(c, VpGetSign(a) * VpGetSign(b));
     VpNmlz(c);            /* normalize c */
     r->Prec = word_r;
     r->exponent = a->exponent;
-    if (!AddExponent(r, 1)) return 0;
+    if (!AddExponent(r, 1)) return;
     VpSetSign(r, VpGetSign(a));
     VpNmlz(r);            /* normalize r(remainder) */
     goto Exit;
@@ -4889,7 +4891,7 @@ Exit:
 	VPrint(stdout, "    r=% \n", r);
     }
 #endif /* BIGDECIMAL_DEBUG */
-    return c->Prec * BASE_FIG;
+    return;
 }
 
 /*
