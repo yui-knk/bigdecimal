@@ -3667,7 +3667,7 @@ VpException(unsigned short f, const char *str,int always)
     return 0; /* 0 Means VpException() raised no exception */
 }
 
-/* Throw exception or returns 0,when resulting c is Inf or NaN */
+/* Throw exception or returns 0, when resulting c is Inf or NaN, otherwise returns 1. */
 /*  sw=1:+ 2:- 3:* 4:/ */
 static int
 VpIsDefOP(Real *c,Real *a,Real *b,int sw)
