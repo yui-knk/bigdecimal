@@ -270,6 +270,7 @@ again:
 
       case T_DATA:
 	if (is_kind_of_BigDecimal(v)) {
+	    /* (RData(v)->data) を Real型として扱っている */
 	    pv = DATA_PTR(v);
 	    return pv;
 	}
@@ -3396,6 +3397,7 @@ static int VpRdup(Real *m, size_t ind_m);
 static int gnAlloc = 0; /* Memory allocation counter */
 #endif /* BIGDECIMAL_DEBUG */
 
+/* 実際に xmalloc を実行し、Realのためのメモリを確保する */
 VP_EXPORT void *
 VpMemAlloc(size_t mb)
 {
@@ -3420,6 +3422,7 @@ VpMemRealloc(void *ptr, size_t mb)
     return p;
 }
 
+/* Realの解放をする */
 VP_EXPORT void
 VpFree(Real *pv)
 {
