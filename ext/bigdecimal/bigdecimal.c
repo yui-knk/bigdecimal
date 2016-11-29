@@ -127,6 +127,20 @@ rb_rational_den(VALUE rat)
 }
 #endif
 
+#ifndef HAVE_RB_SYM2STR
+VALUE
+rb_sym2str(VALUE sym)
+{
+    if (DYNAMIC_SYM_P(sym)) {
+	return RSYMBOL(sym)->fstr;
+    }
+    else {
+	return rb_id2str(STATIC_SYM2ID(sym));
+    }
+}
+
+#endif
+
 /*
  * ================== Ruby Interface part ==========================
  */
