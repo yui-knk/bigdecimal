@@ -470,7 +470,7 @@ check_rounding_mode_option(VALUE const opts)
         if (strncasecmp(s, "even", 4) == 0)
             return VP_ROUND_HALF_EVEN;
         else if (strncasecmp(s, "down", 4) == 0)
-            return VP_ROUND_HALF_EVEN;
+            return VP_ROUND_HALF_DOWN;
         break;
       default:
         break;
@@ -487,9 +487,6 @@ check_rounding_mode(VALUE const v)
     unsigned short sw;
     ID id;
     switch (TYPE(v)) {
-      case T_HASH:
-        return VP_ROUND_HALF_UP;
-
       case T_SYMBOL:
 	id = SYM2ID(v);
 	if (id == id_up)
@@ -1764,8 +1761,8 @@ BigDecimal_round(int argc, VALUE *argv, VALUE self)
 	iLoc = 0;
 	break;
       case 1:
-        if (RB_TYPE_P(vLoc, T_HASH)) {
-	    sw = check_rounding_mode(vLoc);
+	if (RB_TYPE_P(vLoc, T_HASH)) {
+	    sw = check_rounding_mode_option(vLoc);
 	}
 	else {
 	    iLoc = NUM2INT(vLoc);
@@ -1773,7 +1770,13 @@ BigDecimal_round(int argc, VALUE *argv, VALUE self)
 	break;
       case 2:
 	iLoc = NUM2INT(vLoc);
-	sw = check_rounding_mode(vRound);
+
+	if (RB_TYPE_P(vRound, T_HASH)) {
+	    sw = check_rounding_mode_option(vRound);
+	}
+	else {
+	    sw = check_rounding_mode(vRound);
+	}
 	break;
       default:
 	break;
@@ -3399,6 +3402,7 @@ Init_bigdecimal(void)
     id_floor = rb_intern_const("floor");
     id_to_r = rb_intern_const("to_r");
     id_eq = rb_intern_const("==");
+    id_half = rb_intern_const("half");
 }
 
 /*
