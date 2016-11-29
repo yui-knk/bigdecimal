@@ -131,7 +131,7 @@ rb_rational_den(VALUE rat)
 VALUE
 rb_sym2str(VALUE sym)
 {
-    return rb_id2str(STATIC_SYM2ID(sym));
+    return rb_id2str(SYM2ID(sym));
 }
 
 #endif
