@@ -353,6 +353,25 @@ BigDecimal_prec(VALUE self)
     return obj;
 }
 
+static VALUE
+BigDecimal_debug_hash(VALUE self)
+{
+    ENTER(1);
+    Real *p;
+    VALUE obj;
+
+    GUARD_OBJ(p, GetVpValue(self, 1));
+    obj = rb_hash_new();
+
+    rb_hash_aset(obj, rb_id2sym(rb_intern("prec")), INT2NUM(p->Prec));
+    rb_hash_aset(obj, rb_id2sym(rb_intern("max_prec")), INT2NUM(p->MaxPrec));
+    rb_hash_aset(obj, rb_id2sym(rb_intern("exponent")), INT2NUM(p->exponent));
+    rb_hash_aset(obj, rb_id2sym(rb_intern("sign")), INT2NUM(p->sign));
+    rb_hash_aset(obj, rb_id2sym(rb_intern("vp_base_fig")), INT2NUM(VpBaseFig()));
+
+    return obj;
+}
+
 /*
  * call-seq: hash
  *
@@ -3286,6 +3305,7 @@ Init_bigdecimal(void)
     rb_define_method(rb_cBigDecimal, "initialize", BigDecimal_initialize, -1);
     rb_define_method(rb_cBigDecimal, "initialize_copy", BigDecimal_initialize_copy, 1);
     rb_define_method(rb_cBigDecimal, "precs", BigDecimal_prec, 0);
+    rb_define_method(rb_cBigDecimal, "debug_hash", BigDecimal_debug_hash, 0);
 
     rb_define_method(rb_cBigDecimal, "add", BigDecimal_add2, 2);
     rb_define_method(rb_cBigDecimal, "sub", BigDecimal_sub2, 2);
