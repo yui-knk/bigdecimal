@@ -4770,7 +4770,7 @@ VpDivd(Real *c, Real *r, Real *a, Real *b)
     if (!VpIsDefOP(c, a, b, OP_SW_DIV)) goto Exit;
     if (VpIsZero(a) && VpIsZero(b)) {
 	VpSetNaN(c);
-	return VpException(VP_EXCEPTION_NaN, "Computation results to 'NaN'", 0);
+        return VpException(VP_EXCEPTION_ZERODIVIDE, "Divide by zero", 0);
     }
     if (VpIsZero(b)) {
 	VpSetInf(c, VpGetSign(a) * VpGetSign(b));

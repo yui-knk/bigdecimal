@@ -789,10 +789,28 @@ class TestBigDecimal < Test::Unit::TestCase
     assert_negative_zero(BigDecimal.new("1.0")  / BigDecimal.new("-Infinity"))
     assert_positive_zero(BigDecimal.new("-1.0") / BigDecimal.new("-Infinity"))
 
+    BigDecimal.mode(BigDecimal::EXCEPTION_NaN, false)
+    BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, false)
+    assert_nan(BigDecimal.new("0") / BigDecimal.new("0"))
+
+    BigDecimal.mode(BigDecimal::EXCEPTION_NaN, true)
+    BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, false)
+    assert_raise_with_message(FloatDomainError, "Computation results to 'NaN'(Not a Number)") { BigDecimal.new("0") / 0 }
+
     BigDecimal.mode(BigDecimal::EXCEPTION_INFINITY, true)
     BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, false)
     assert_raise_with_message(FloatDomainError, "Computation results to 'Infinity'") { BigDecimal.new("1") / 0 }
     assert_raise_with_message(FloatDomainError, "Computation results to '-Infinity'") { BigDecimal.new("-1") / 0 }
+
+    BigDecimal.mode(BigDecimal::EXCEPTION_INFINITY, false)
+    BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, true)
+    assert_raise_with_message(FloatDomainError, "Divide by zero") { BigDecimal.new("1") / 0 }
+    assert_raise_with_message(FloatDomainError, "Divide by zero") { BigDecimal.new("-1") / 0 }
+
+    BigDecimal.mode(BigDecimal::EXCEPTION_NaN, false)
+    BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, true)
+    assert_raise_with_message(FloatDomainError, "Divide by zero") { BigDecimal.new("0") / 0 }
+    assert_raise_with_message(FloatDomainError, "Divide by zero") { BigDecimal.new("-0") / 0 }
   end
 
   def test_div_with_float
@@ -809,6 +827,16 @@ class TestBigDecimal < Test::Unit::TestCase
     assert_equal(2, (-x) % 3)
     assert_equal(-2, x % -3)
     assert_equal(-1, (-x) % -3)
+
+    # BigDecimal.mode(BigDecimal::EXCEPTION_INFINITY, false)
+    # BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, true)
+    # assert_raise_with_message(FloatDomainError, "Divide by zero") { BigDecimal.new("1") % 0 }
+    # assert_raise_with_message(FloatDomainError, "Divide by zero") { BigDecimal.new("-1") % 0 }
+
+    # BigDecimal.mode(BigDecimal::EXCEPTION_NaN, false)
+    # BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, true)
+    # assert_raise_with_message(FloatDomainError, "Divide by zero") { BigDecimal.new("0") % 0 }
+    # assert_raise_with_message(FloatDomainError, "Divide by zero") { BigDecimal.new("-0") % 0 }
   end
 
   def test_mod_with_float
@@ -876,6 +904,16 @@ class TestBigDecimal < Test::Unit::TestCase
     BigDecimal.save_exception_mode do
       BigDecimal.mode(BigDecimal::EXCEPTION_INFINITY, false)
       assert_equal(0, BigDecimal("0").div(BigDecimal("Infinity")))
+    end
+    BigDecimal.save_exception_mode do
+      BigDecimal.mode(BigDecimal::EXCEPTION_NaN, false)
+      BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, false)
+      assert_nan(BigDecimal("0").div(BigDecimal("0")))
+    end
+    BigDecimal.save_exception_mode do
+      BigDecimal.mode(BigDecimal::EXCEPTION_NaN, false)
+      BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, true)
+      assert_raise(FloatDomainError) { BigDecimal("0").div(BigDecimal("0")) }
     end
   end
 
