@@ -805,6 +805,12 @@ class TestBigDecimal < Test::Unit::TestCase
     BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, false)
     assert_raise_with_message(FloatDomainError, "Computation results to 'Infinity'") { BigDecimal.new("1") / 0 }
     assert_raise_with_message(FloatDomainError, "Computation results to '-Infinity'") { BigDecimal.new("-1") / 0 }
+
+    BigDecimal.save_exception_mode do
+      BigDecimal.mode(BigDecimal::EXCEPTION_NaN, false)
+      BigDecimal.mode(BigDecimal::EXCEPTION_ZERODIVIDE, true)
+      assert_raise_with_message(FloatDomainError, "") { BigDecimal.new("0") / 0 }
+    end
   end
 
   def test_div_with_float
@@ -928,9 +934,12 @@ class TestBigDecimal < Test::Unit::TestCase
 
     BigDecimal.mode(BigDecimal::EXCEPTION_OVERFLOW, false)
     BigDecimal.mode(BigDecimal::EXCEPTION_NaN, false)
-    assert_raise(FloatDomainError) { BigDecimal.new("NaN").sqrt(1) }
+    assert_raise(FloatDomainError, "#sqrt (NaN)") { BigDecimal.new("NaN").sqrt(1) }
+    assert_raise(FloatDomainError, "#sqrt (negative value)") { BigDecimal.new("-Infinity").sqrt(1) }
+    assert_raise(FloatDomainError, "#sqrt (negative value)") { BigDecimal.new("-1").sqrt(1) }
 
     assert_equal(0, BigDecimal.new("0").sqrt(1))
+    assert_equal(0, BigDecimal.new("-0").sqrt(1))
     assert_equal(1, BigDecimal.new("1").sqrt(1))
   end
 
