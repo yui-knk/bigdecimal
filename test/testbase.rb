@@ -1,5 +1,10 @@
 # frozen_string_literal: false
-require "test/unit"
+if RUBY_VERSION < "2.0.0"
+  require "test/unit_old"
+else
+  require "test/unit"
+end
+
 require "bigdecimal"
 
 module TestBigDecimalBase

@@ -1,5 +1,9 @@
 # frozen_string_literal: false
-require 'test/unit/assertions'
+if RUBY_VERSION < "2.0.0"
+  require 'test/unit/assertions_old'
+else
+  require 'test/unit/assertions'
+end
 
 module Test
   module Unit

@@ -1777,12 +1777,13 @@ class TestBigDecimal < Test::Unit::TestCase
     EOS
   end
 
-  def assert_no_memory_leak(code, *rest, **opt)
+  def assert_no_memory_leak(code, *rest)
+    opt = rest.last.is_a?(Hash) ? rest.pop : {}
     code = "8.times {20_000.times {begin #{code}; rescue NoMemoryError; end}; GC.start}"
     super(["-rbigdecimal"],
           "b = BigDecimal('10'); b.nil?; " \
           "GC.add_stress_to_class(BigDecimal); "\
-          "#{code}", code, *rest, rss: true, limit: 1.1, **opt)
+          "#{code}", code, *rest, { rss: true, limit: 1.1 }.merge(opt))
   end
 
   if EnvUtil.gc_stress_to_class?
