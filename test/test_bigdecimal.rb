@@ -1786,7 +1786,7 @@ class TestBigDecimal < Test::Unit::TestCase
           "#{code}", code, *rest, { rss: true, limit: 1.1 }.merge(opt))
   end
 
-  if EnvUtil.gc_stress_to_class?
+  if EnvUtil.respond_to?(:gc_stress_to_class?) && EnvUtil.gc_stress_to_class?
     def test_no_memory_leak_allocate
       assert_no_memory_leak("BigDecimal.allocate")
     end
