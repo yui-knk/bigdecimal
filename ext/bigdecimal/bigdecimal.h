@@ -132,6 +132,10 @@ rb_array_const_ptr(VALUE a)
 # define RARRAY_AREF(a, i) (RARRAY_CONST_PTR(a)[i])
 #endif
 
+#ifndef NUM2USHORT
+# define NUM2USHORT(x) ((unsigned short)NUM2INT(x))
+#endif
+
 #ifndef HAVE_RB_SYM2STR
 static inline VALUE
 rb_sym2str(VALUE sym)
